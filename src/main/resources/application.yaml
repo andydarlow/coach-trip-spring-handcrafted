@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: coachtrip
+  datasource:
+    url: OVERRIDE #jdbc:postgresql://localhost:5432/coachtrips
+    username: OVERRIDE
+    password: OVERRIDE
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
