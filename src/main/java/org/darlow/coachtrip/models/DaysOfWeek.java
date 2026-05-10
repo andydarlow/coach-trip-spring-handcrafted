@@ -7,5 +7,6 @@ public enum DaysOfWeek {
     THURSDAY,
     FRIDAY,
     SATURDAY,
+    SUNDAY
 
 }

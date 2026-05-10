@@ -237,5 +237,128 @@ class CoachSchedulesRestValidationTest {
 	}
 
 
+	@Test
+	void missingArrivalTimeTest() throws Exception {
+
+		callNewScheduleAPI("""
+				{
+				   "departureTime": "19:20",
+				   "departureCity": "LONDON",
+				   "arrivalCity": "MANCHESTER",
+				   "scheduleDays": ["MONDAY","THURSDAY"]
+				}
+				""")
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("arrivalTime:Arrival time is required"))
+				.andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.toString()));
+	}
+
+	@Test
+	void blankArrivalTimeTest() throws Exception {
+
+		callNewScheduleAPI("""
+				{
+				   "departureTime": "19:20",
+				   "departureCity": "LONDON",
+				   "arrivalCity": "MANCHESTER",
+				   "scheduleDays": ["WEDNESDAY"]
+				}
+				""")
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("arrivalTime:Arrival time is required"))
+				.andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.toString()));
+	}
+
+	@Test
+	void blankDepartureCityTest() throws Exception {
+
+		callNewScheduleAPI("""
+				{
+					"arrivalTime": "19:20",
+				   "departureTime": "19:20",
+				   "departureCity": "",
+				   "arrivalCity": "MANCHESTER",
+				   "scheduleDays": ["WEDNESDAY"]
+				}
+				""")
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("departureCity:city must be between 3 and 100 character"))
+				.andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.toString()));
+	}
+
+
+	@Test
+	void missingDepartureCityTest() throws Exception {
+
+		callNewScheduleAPI("""
+				{
+					"arrivalTime": "19:20",
+				   "departureTime": "19:20",
+				   "arrivalCity": "MANCHESTER",
+				   "scheduleDays": ["WEDNESDAY"]
+				}
+				""")
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("departureCity:Departure city is required"))
+				.andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.toString()));
+	}
+
+
+
+
+	@Test
+	void blankArrivalCityTest() throws Exception {
+
+		callNewScheduleAPI("""
+				{
+					"arrivalTime": "19:20",
+				   "departureTime": "19:20",
+				   "departureCity": "LONDON",
+				   "arrivalCity": "",
+				   "scheduleDays": ["SATURDAY","SUNDAY"]
+				}
+				""")
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("arrivalCity:city must be between 3 and 100 character"))
+				.andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.toString()));
+	}
+
+
+	@Test
+	void missingArrivalCityTest() throws Exception {
+
+		callNewScheduleAPI("""
+				{
+					"arrivalTime": "19:20",
+				   "departureTime": "19:20",
+				   "departureCity": "MANCHESTER",
+				   "scheduleDays": ["FRIDAY"]
+				}
+				""")
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("arrivalCity:Arrival city is required"))
+				.andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.toString()));
+	}
+
+
+
+
+	@Test
+	void badArrivalTimeTest() throws Exception {
+
+		callNewScheduleAPI("""
+				{
+				   "departureTime": "13:20",
+				   "arrivalTime": "19:20.909",
+				   "departureCity": "LONDON",
+				   "arrivalCity": "MANCHESTER",
+				   "scheduleDays": ["BADDAY"]
+				}
+				""")
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Invalid date/time format: 19:20.909. expected hh:mm"))
+				.andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.toString()));
+	}
+
 
 }
