@@ -12,6 +12,8 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.core.exc.UnexpectedEndOfInputException;
 import tools.jackson.databind.exc.InvalidFormatException;
 
 import java.time.format.DateTimeParseException;
@@ -32,8 +34,12 @@ public class DTOErrorHandler {
         String errorMessage = switch (cause) {
             case InvalidFormatException e ->
                     String.format("Field '%s' cannot accept value '%s'",
-                            e.getPath(), e.getValue());
+                            e.getPath().getFirst().getPropertyName(), e.getValue());
             case DateTimeParseException e -> "Invalid date/time format: " + e.getParsedString()  + ". expected hh:mm";
+            // need this one to stop the location of the code parsing the message appaearing. Order impartant.
+            case UnexpectedEndOfInputException e -> "Invalid Message format: JSON parse error: Unexpected end-of-input: expected close marker";
+            case HttpMessageNotReadableException e -> "Invalid Message format: message not readable";
+            case StreamReadException e -> "Invalid Message format: " + e.getOriginalMessage();
             default -> "Readable error: " + cause.getMessage();
         };
         return new ErrorMessage(errorMessage,HttpStatus.BAD_REQUEST ).toResponseEntity();
@@ -52,9 +58,10 @@ public class DTOErrorHandler {
         String errorMessages = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(error -> error.getObjectName() + ":" +
+                .map(error -> error.getField() + ":" +
                                         error.getDefaultMessage())
-                .collect(Collectors.joining());
+                .sorted()
+                .collect(Collectors.joining(","));
         return new ErrorMessage(errorMessages,HttpStatus.BAD_REQUEST ).toResponseEntity();
     }
 

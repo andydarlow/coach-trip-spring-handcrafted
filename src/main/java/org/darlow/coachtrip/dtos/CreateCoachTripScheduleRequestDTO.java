@@ -16,18 +16,18 @@ import java.util.List;
 @Data
 public class CreateCoachTripScheduleRequestDTO {
 
-    @NotNull(message = "Derature date is required")
+    @NotNull(message = "Departure time is required")
     @JsonFormat(pattern = "HH:mm")
     private LocalTime departureTime;
-    @NotNull(message = "Arrival date is required")
+    @NotNull(message = "Arrival time is required")
     @JsonFormat(pattern = "HH:mm")
     private LocalTime arrivalTime;
 
-    @NotNull(message = "departure city is require")
+    @NotNull(message = "Departure city is required")
     @Size(min=3, max = 100, message = "city must be between 3 and 100 character")
     private String departureCity;
 
-    @NotNull(message = "arrival city is require")
+    @NotNull(message = "Arrival city is required")
     @Size(min=3, max = 100, message = "city must be between 3 and 100 character")
     private String arrivalCity;
 
